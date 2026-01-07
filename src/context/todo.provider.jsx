@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { TodoContext } from "./TodoContext";
+import { useEffect, useState } from "react";
+import { TodoContext } from "./index.js";
 
 export const TodoProvider = ({ children }) => {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      todo: "Learn React",
-      isCompleted: false,
-    },
-  ]);
+  const [todos, setTodos] = useState(() => {
+    try {
+      const todos = localStorage.getItem("todos");
+      return todos ? JSON.parse(todos) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const addTodo = (todo) => {
     setTodos((prev) => [
       {
-        id: Date.now(),
         ...todo,
       },
       ...prev,
@@ -41,6 +41,10 @@ export const TodoProvider = ({ children }) => {
       )
     );
   };
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
   return (
     <TodoContext.Provider
